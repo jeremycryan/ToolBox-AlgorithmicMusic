@@ -6,6 +6,7 @@ from random import choice
 
 from psonic import *
 
+
 # The sample directory is relative to this source file's directory.
 SAMPLES_DIR = os.path.join(os.path.dirname(__file__), "samples")
 
@@ -33,10 +34,27 @@ def stop():
     msg = msg.build()
     synthServer.client.send(msg)
 
-atexit.register(stop)  # stop all tracks when the program exits normally or is interrupted
+BACKING_TRACK = os.path.join(SAMPLES_DIR, "backing.wav")
+sample(BACKING_TRACK, amp=5)
+sleep(2.25)  # delay the solo to match up with backing track
+
+atexit.register(stop)
+
+  # stop all tracks when the program exits normally or is interrupted
 
 # These are the piano key numbers for a 3-octave blues scale in A. See: http://en.wikipedia.org/wiki/Blues_scale
 blues_scale = [40, 43, 45, 46, 47, 50, 52, 55, 57, 58, 59, 62, 64, 67, 69, 70, 71, 74, 76]
-beats_per_minute = 45				# Let's make a slow blues solo
+beats_per_minute = 120				# Let's make a slow blues solo
 
-play_note(blues_scale[0], beats=1, bpm=beats_per_minute)
+curr_note = 7
+licks = [[(1, 0.66), (1, 0.33), (1, 0.66), (1, 0.33)], [(-1, 0.33), (-1, 0.33), (1, 0.33), (-2, 1)], [(0, 0.66), (-1, 0.66), (-2, 0.66)], [(1, 0.33), (1, 0.33), (1, 0.33), (1, 0.33), (1, 0.33), (1, 0.33)], [(-1, 0.66), (1, 0.33), (1, 1)], [(1, 1.66), (1, 0.33)], [(-1, 1), (-1, 0.66), (-2, 0.33)], [(0, 0.33), (-1, 0.33), (1, 1.33)]]
+for _ in range(8):
+    lick = random.choice(licks)
+    if random.random() < 0.5:
+        curr_note = 6
+    elif random.random() < 0.5:
+        curr_note = 12
+    for note in lick:
+        curr_note += note[0]
+        play_note(blues_scale[curr_note], note[1], beats_per_minute)
+play_note(6, 1, beats_per_minute)
